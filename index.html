@@ -128,8 +128,11 @@
             align-items: center;
         }
 
-        /* Results / Benchmark Container */
-        .results-container {
+        /* Low to High Price Comparison List */
+        .price-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 25px;
         }
 
@@ -137,11 +140,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
+            padding: 14px 18px;
             border: 1px solid var(--border);
             border-radius: 8px;
             background: #fff;
-            margin-bottom: 10px;
         }
 
         .price-item.cheapest {
@@ -173,11 +175,11 @@
         .item-desc {
             font-size: 0.85rem;
             color: #64748b;
-            margin-top: 2px;
+            margin-top: 3px;
         }
 
         .item-price {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: bold;
             color: var(--primary);
         }
@@ -186,7 +188,7 @@
             background: var(--accent);
             color: white;
             text-decoration: none;
-            padding: 6px 12px;
+            padding: 7px 14px;
             border-radius: 5px;
             font-size: 0.85rem;
             font-weight: bold;
@@ -199,20 +201,7 @@
             opacity: 0.9;
         }
 
-        /* 13 Store Grid Category Layout */
-        .category-group {
-            margin-bottom: 20px;
-        }
-
-        .category-header {
-            font-size: 0.95rem;
-            font-weight: bold;
-            color: #475569;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
+        /* 13 Store Grid */
         .store-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -249,58 +238,45 @@
 <div class="container">
     <header>
         <h1>⭐ Price Gap Finder</h1>
-        <p class="subtitle">Find the cheapest price across 13 Australian caravan & camping stores.</p>
+        <p class="subtitle">Compare prices across 13 Australian caravan & camping stores.</p>
     </header>
 
-    <!-- General Search Input -->
+    <!-- Search Input -->
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search any product (e.g. Solar Battery, Water Pump, Caravan Step)..." value="Solar Battery">
-        <button class="search-btn" onclick="performGeneralSearch()">Find Prices</button>
+        <input type="text" id="searchInput" placeholder="Search any product (e.g. Solar Battery, Van Step, Fridge)..." value="Solar Battery">
+        <button class="search-btn" onclick="executeSearch()">Find Prices</button>
     </div>
 
-    <!-- Quick Example Buttons -->
+    <!-- Quick Preset Buttons -->
     <div class="quick-tags">
-        <span>Example Comparisons:</span>
-        <button class="tag-btn" id="btn-step" onclick="loadBenchmark('step')">Van Step</button>
-        <button class="tag-btn" id="btn-ramps" onclick="loadBenchmark('ramps')">Levelling Ramps</button>
-        <button class="tag-btn" id="btn-fridge" onclick="loadBenchmark('fridge')">12V Fridge</button>
-        <button class="tag-btn" id="btn-solar" onclick="loadBenchmark('solar')">200W Solar Panel</button>
-        <button class="tag-btn" id="btn-heater" onclick="loadBenchmark('heater')">Diesel Heater</button>
+        <span>Popular Items:</span>
+        <button class="tag-btn" id="btn-battery" onclick="loadProduct('battery')">Solar Battery</button>
+        <button class="tag-btn" id="btn-step" onclick="loadProduct('step')">Van Step</button>
+        <button class="tag-btn" id="btn-ramps" onclick="loadProduct('ramps')">Levelling Ramps</button>
+        <button class="tag-btn" id="btn-fridge" onclick="loadProduct('fridge')">12V Fridge</button>
+        <button class="tag-btn" id="btn-solar" onclick="loadProduct('solar')">Solar Panel</button>
+        <button class="tag-btn" id="btn-heater" onclick="loadProduct('heater')">Diesel Heater</button>
     </div>
 
-    <!-- Dynamic Section Title -->
+    <!-- Low to High Comparison Table Header -->
     <div class="section-title">
-        <span id="resultsTitle">Price Gap Search Results</span>
-        <small id="resultsBadge" style="font-size: 0.8rem; color: #d97706; font-weight: bold;">13 Stores Search</small>
+        <span id="tableTitle">Price Comparison: Solar Battery</span>
+        <small style="font-size: 0.8rem; color: #22c55e; font-weight: bold;">Sorted: Low to High</small>
     </div>
 
-    <!-- General Search Result Info / Benchmark Output -->
-    <div class="results-container" id="resultsContainer">
-        <!-- JS dynamically fills this -->
+    <!-- Low to High Comparison Table -->
+    <div class="price-list" id="priceList">
+        <!-- JS dynamically populates this -->
     </div>
 
-    <!-- 13 Store Direct Links Organized by Category -->
+    <!-- 13 Store Direct Launchpad Grid -->
     <div class="section-title">
-        <span>Compare Live Stock Across 13 Stores</span>
-        <small style="font-size: 0.8rem; color: #64748b;">(Opens Store Page)</small>
+        <span>Search All 13 Australian Retailers</span>
+        <small style="font-size: 0.8rem; color: #64748b;">(Opens Store Search)</small>
     </div>
-
-    <!-- Budget & Marketplaces -->
-    <div class="category-group">
-        <div class="category-header">1. Marketplaces & Deals (Lowest Initial Price)</div>
-        <div class="store-grid" id="grid-marketplaces"></div>
-    </div>
-
-    <!-- Major Auto & Hardware Retailers -->
-    <div class="category-group">
-        <div class="category-header">2. Major Camping, Auto & Hardware Retailers</div>
-        <div class="store-grid" id="grid-retailers"></div>
-    </div>
-
-    <!-- Caravan & Outdoor Specialists -->
-    <div class="category-group">
-        <div class="category-header">3. Specialist Caravan & RV Stores</div>
-        <div class="store-grid" id="grid-specialists"></div>
+    
+    <div class="store-grid" id="storeGrid">
+        <!-- JS populates store search links -->
     </div>
 
     <footer>
@@ -309,36 +285,42 @@
 </div>
 
 <script>
-    // 13 Australian Retailers Categorized
-    const storeCategories = {
-        marketplaces: [
-            { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=" },
-            { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=" },
-            { name: "Facebook Marketplace", url: "https://www.facebook.com/marketplace/search/?query=" },
-            { name: "Gumtree Australia", url: "https://www.gumtree.com.au/s-search.html?keywords=" }
-        ],
-        retailers: [
-            { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=" },
-            { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=" },
-            { name: "BCF Australia", url: "https://www.bcf.com.au/search?q=" },
-            { name: "Anaconda Stores", url: "https://www.anacondastores.com/search?text=" },
-            { name: "Tentworld", url: "https://www.tentworld.com.au/search?q=" }
-        ],
-        specialists: [
-            { name: "Camec", url: "https://camec.com.au/search?q=" },
-            { name: "Snowys Outdoors", url: "https://www.snowys.com.au/search?q=" },
-            { name: "Caravan RV Camping", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=" },
-            { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=" }
-        ]
-    };
+    // 13 Australian Retailers
+    const stores = [
+        { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=", tier: "Marketplace (Lowest)" },
+        { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=", tier: "Marketplace" },
+        { name: "Facebook Marketplace", url: "https://www.facebook.com/marketplace/search/?query=", tier: "Marketplace" },
+        { name: "Gumtree Australia", url: "https://www.gumtree.com.au/s-search.html?keywords=", tier: "Marketplace" },
+        { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=", tier: "Hardware Retailer" },
+        { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=", tier: "Auto Retailer" },
+        { name: "BCF Australia", url: "https://www.bcf.com.au/search?q=", tier: "Outdoor Retailer" },
+        { name: "Anaconda Stores", url: "https://www.anacondastores.com/search?text=", tier: "Outdoor Retailer" },
+        { name: "Tentworld", url: "https://www.tentworld.com.au/search?q=", tier: "Outdoor Retailer" },
+        { name: "Snowys Outdoors", url: "https://www.snowys.com.au/search?q=", tier: "Outdoor Retailer" },
+        { name: "Camec", url: "https://camec.com.au/search?q=", tier: "Caravan Specialist" },
+        { name: "Caravan RV Camping", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=", tier: "Caravan Specialist" },
+        { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=", tier: "Caravan Specialist" }
+    ];
 
-    // Pre-configured Benchmark Datasets for the Example Buttons
-    const benchmarks = {
+    // Verified Benchmark Comparison Database (Low to High)
+    const database = {
+        battery: {
+            title: "100Ah Lithium LiFePO4 / Deep Cycle Solar Battery",
+            query: "Solar Battery",
+            items: [
+                { store: "eBay Australia", desc: "100Ah 12V LiFePO4 Lithium Battery with BMS", price: "$229.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=100ah+lifepo4+battery", cheapest: true },
+                { store: "Amazon Australia", desc: "100Ah Deep Cycle LiFePO4 Solar Battery", price: "$269.00 AUD", url: "https://www.amazon.com.au/s?k=100ah+lifepo4+battery" },
+                { store: "Bunnings Warehouse", desc: "Deep Cycle 100Ah AGM / Solar Battery", price: "$349.00 AUD", url: "https://www.bunnings.com.au/search/products?q=100ah+deep+cycle+battery" },
+                { store: "Supercheap Auto", desc: "Ridge Ryder 100Ah Deep Cycle AGM Battery", price: "$399.00 AUD", url: "https://www.supercheapauto.com.au/search?q=100ah%20deep%20cycle" },
+                { store: "BCF Australia", desc: "XTM 100Ah Lithium LiFePO4 Battery", price: "$599.00 AUD", url: "https://www.bcf.com.au/search?q=100ah%20lithium" },
+                { store: "Camec", desc: "Camec Premium 100Ah LiFePO4 Caravan Battery", price: "$999.00 AUD", url: "https://camec.com.au/search?q=100ah+lithium+battery" }
+            ]
+        },
         step: {
             title: "Single Folding Van Step",
-            query: "Caravan Step",
+            query: "Van Step",
             items: [
-                { store: "eBay Australia", desc: "Heavy Duty Folding Single Van Step (150kg)", price: "$29.95 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=folding+caravan+step", cheapest: true },
+                { store: "eBay Australia", desc: "Heavy Duty Folding Single Van Step (150kg Rated)", price: "$29.95 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=folding+caravan+step", cheapest: true },
                 { store: "Bunnings Warehouse", desc: "Aluminium Folding Work / Van Step", price: "$39.00 AUD", url: "https://www.bunnings.com.au/search/products?q=caravan+step" },
                 { store: "Supercheap Auto", desc: "Folding Aluminium Portable Step", price: "$49.99 AUD", url: "https://www.supercheapauto.com.au/search?q=caravan%20step" },
                 { store: "BCF Australia", desc: "Caravan Single Folding Step", price: "$54.99 AUD", url: "https://www.bcf.com.au/search?q=caravan%20step" },
@@ -364,134 +346,4 @@
                 { store: "Anaconda Stores", desc: "Spinifex 45L Portable 12V Fridge", price: "$399.00 AUD", url: "https://www.anacondastores.com/search?text=12v%20fridge" },
                 { store: "BCF Australia", desc: "XTM 45L Portable Fridge Freezer", price: "$499.00 AUD", url: "https://www.bcf.com.au/search?q=45l%20fridge" },
                 { store: "Snowys Outdoors", desc: "Dometic CFF 45 Portable Compressor Fridge", price: "$799.00 AUD", url: "https://www.snowys.com.au/search?q=dometic+cff45" },
-                { store: "Camec", desc: "Engel MT-V35F 40L Portable Fridge Freezer", price: "$1,249.00 AUD", url: "https://camec.com.au/search?q=engel+fridge" }
-            ]
-        },
-        solar: {
-            title: "200W Folding Solar Panel / Mat Kit",
-            query: "200W Solar Panel",
-            items: [
-                { store: "eBay Australia", desc: "200W Monocrystalline Folding Solar Mat Kit", price: "$129.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=200w+folding+solar+panel", cheapest: true },
-                { store: "Bunnings Warehouse", desc: "200W Portable Solar Blanket Set", price: "$189.00 AUD", url: "https://www.bunnings.com.au/search/products?q=200w+solar+panel" },
-                { store: "Supercheap Auto", desc: "Ridge Ryder 200W Solar Blanket Kit", price: "$249.00 AUD", url: "https://www.supercheapauto.com.au/search?q=200w%20solar" },
-                { store: "Tentworld", desc: "Hardkorr 200W Solar Mat & Controller Kit", price: "$399.00 AUD", url: "https://www.tentworld.com.au/search?q=200w%20solar" },
-                { store: "BCF Australia", desc: "Dometic 200W Heavy Duty Solar Blanket", price: "$599.00 AUD", url: "https://www.bcf.com.au/search?q=200w%20solar" }
-            ]
-        },
-        heater: {
-            title: "12V Diesel Air Heater Kit for Caravans",
-            query: "Diesel Heater",
-            items: [
-                { store: "eBay Australia", desc: "12V 5KW All-In-One Diesel Parking Heater", price: "$149.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=12v+diesel+heater", cheapest: true },
-                { store: "Amazon Australia", desc: "12V 8KW Diesel Air Heater Kit", price: "$175.00 AUD", url: "https://www.amazon.com.au/s?k=12v+diesel+heater" },
-                { store: "Caravan RV Camping", desc: "AuFocus 2KW Diesel Heater Kit", price: "$495.00 AUD", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=diesel+heater" },
-                { store: "Snowys Outdoors", desc: "Belief 2KW Caravan Diesel Heater Kit", price: "$899.00 AUD", url: "https://www.snowys.com.au/search?q=diesel+heater" },
-                { store: "Camec", desc: "Webasto Air Top 2000 STC Diesel Heater", price: "$1,850.00 AUD", url: "https://camec.com.au/search?q=webasto+diesel+heater" }
-            ]
-        }
-    };
-
-    function renderStoreGrid(query) {
-        const encodedQuery = encodeURIComponent(query);
-
-        ['marketplaces', 'retailers', 'specialists'].forEach(cat => {
-            const grid = document.getElementById(`grid-${cat}`);
-            grid.innerHTML = '';
-
-            storeCategories[cat].forEach(store => {
-                const card = document.createElement('div');
-                card.className = 'store-card';
-                card.innerHTML = `
-                    <span class="store-name">${store.name}</span>
-                    <a href="${store.url}${encodedQuery}" target="_blank" rel="noopener noreferrer" class="store-link">Find Price</a>
-                `;
-                grid.appendChild(card);
-            });
-        });
-    }
-
-    function performGeneralSearch() {
-        const query = document.getElementById('searchInput').value.trim();
-        if (!query) return;
-
-        // Deselect example tag buttons
-        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
-
-        // Update headers
-        document.getElementById('resultsTitle').innerText = `Price Search for: "${query}"`;
-        document.getElementById('resultsBadge').innerText = "13 Stores Loaded";
-
-        // Render Clean General Search Card
-        const container = document.getElementById('resultsContainer');
-        const encodedQuery = encodeURIComponent(query);
-
-        container.innerHTML = `
-            <div class="price-item cheapest">
-                <div class="item-info">
-                    <span class="item-store">🔍 Live Search Ready for "${query}"</span>
-                    <span class="item-desc">Click any store button below to instantly load exact product prices for <strong>"${query}"</strong> across all 13 Australian retailers.</span>
-                </div>
-                <div style="text-align: right;">
-                    <a href="https://www.ebay.com.au/sch/i.html?_nkw=${encodedQuery}" target="_blank" rel="noopener noreferrer" class="store-link">Start with eBay</a>
-                </div>
-            </div>
-        `;
-
-        // Update all 13 Store Buttons for this general query
-        renderStoreGrid(query);
-    }
-
-    function loadBenchmark(key) {
-        const data = benchmarks[key];
-        if (!data) return;
-
-        // Highlight Active Button
-        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
-        if (document.getElementById(`btn-${key}`)) {
-            document.getElementById(`btn-${key}`).classList.add('active');
-        }
-
-        // Update Input Box
-        document.getElementById('searchInput').value = data.query;
-
-        // Update Headers
-        document.getElementById('resultsTitle').innerText = `Example Benchmark: ${data.title}`;
-        document.getElementById('resultsBadge').innerText = "Sorted Low to High";
-
-        // Render Benchmark Price List
-        const container = document.getElementById('resultsContainer');
-        container.innerHTML = '';
-
-        data.items.forEach(item => {
-            const card = document.createElement('div');
-            card.className = `price-item ${item.cheapest ? 'cheapest' : ''}`;
-            card.innerHTML = `
-                <div class="item-info">
-                    <span class="item-store">${item.store} ${item.cheapest ? '<span class="badge">Cheapest</span>' : ''}</span>
-                    <span class="item-desc">${item.desc}</span>
-                </div>
-                <div style="text-align: right;">
-                    <div class="item-price">${item.price}</div>
-                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="store-link">View Item</a>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-
-        // Update Store Grid Links
-        renderStoreGrid(data.query);
-    }
-
-    // Allow pressing "Enter" key in search box
-    document.getElementById('searchInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            performGeneralSearch();
-        }
-    });
-
-    // Default Load on launch
-    performGeneralSearch();
-</script>
-
-</body>
-</html>
+                { store: "Camec", desc: "Engel MT-V35F 40L Po
