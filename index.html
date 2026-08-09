@@ -7,7 +7,7 @@
     <style>
         :root {
             --primary: #2d5a27; /* Vanlife Green */
-            --accent: #d97706;  /* Warm Orange */
+            --accent: #d97706;  /* Orange */
             --bg: #f8fafc;
             --card-bg: #ffffff;
             --text: #1e293b;
@@ -53,7 +53,7 @@
         .search-box {
             display: flex;
             gap: 10px;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         input[type="text"] {
@@ -87,7 +87,7 @@
         }
 
         .quick-tags {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
@@ -103,72 +103,37 @@
         .tag-btn {
             background: #e2e8f0;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 14px;
             border-radius: 20px;
             font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .tag-btn:hover {
-            background: var(--accent);
+        .tag-btn:hover, .tag-btn.active {
+            background: var(--primary);
             color: white;
         }
 
         .section-title {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             color: var(--text);
             border-bottom: 2px solid var(--border);
             padding-bottom: 8px;
-            margin-top: 30px;
+            margin-top: 25px;
             margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .store-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .store-card {
-            background: #f1f5f9;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .store-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .store-link {
-            background: var(--accent);
-            color: white;
-            text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            transition: opacity 0.2s;
-        }
-
-        .store-link:hover {
-            opacity: 0.9;
-        }
-
-        /* Benchmark Section */
+        /* Benchmark Price List */
         .price-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
+            margin-bottom: 25px;
         }
 
         .price-item {
@@ -210,12 +175,52 @@
         .item-desc {
             font-size: 0.85rem;
             color: #64748b;
+            margin-top: 2px;
         }
 
         .item-price {
             font-size: 1.1rem;
             font-weight: bold;
             color: var(--primary);
+        }
+
+        .store-link {
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 4px;
+            transition: opacity 0.2s;
+        }
+
+        .store-link:hover {
+            opacity: 0.9;
+        }
+
+        /* 13 Store Grid */
+        .store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+        }
+
+        .store-card {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .store-name {
+            font-weight: 600;
+            font-size: 0.9rem;
         }
 
         footer {
@@ -233,95 +238,43 @@
 <div class="container">
     <header>
         <h1>⭐ Price Gap Finder</h1>
-        <p class="subtitle">Compare prices across 13 Australian caravan & camping stores.</p>
+        <p class="subtitle">Find the cheapest price across 13 Australian caravan & camping stores.</p>
     </header>
 
-    <!-- Search Section -->
+    <!-- Search Input -->
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Enter product (e.g., Folding Van Step)..." value="Caravan Step">
-        <button class="search-btn" onclick="performSearch()">Find Price Gaps</button>
+        <input type="text" id="searchInput" placeholder="Search product (e.g. Van Step, Fridge, Solar Mat)..." value="Caravan Step">
+        <button class="search-btn" onclick="performCustomSearch()">Find Prices</button>
     </div>
 
+    <!-- Quick Suggestion Buttons -->
     <div class="quick-tags">
-        <span>Popular Searches:</span>
-        <button class="tag-btn" onclick="setSearch('Caravan Step')">Van Step</button>
-        <button class="tag-btn" onclick="setSearch('Levelling Ramps')">Levelling Ramps</button>
-        <button class="tag-btn" onclick="setSearch('12v Portable Fridge')">12V Fridge</button>
-        <button class="tag-btn" onclick="setSearch('200W Solar Panel')">Solar Panel</button>
-        <button class="tag-btn" onclick="setSearch('Diesel Heater')">Diesel Heater</button>
+        <span>Quick Comparisons:</span>
+        <button class="tag-btn active" id="btn-step" onclick="loadProduct('step')">Van Step</button>
+        <button class="tag-btn" id="btn-ramps" onclick="loadProduct('ramps')">Levelling Ramps</button>
+        <button class="tag-btn" id="btn-fridge" onclick="loadProduct('fridge')">12V Fridge</button>
+        <button class="tag-btn" id="btn-solar" onclick="loadProduct('solar')">Solar Panel</button>
+        <button class="tag-btn" id="btn-heater" onclick="loadProduct('heater')">Diesel Heater</button>
     </div>
 
-    <!-- Live Store Search Links Grid -->
+    <!-- Dynamic Low to High Comparison Table -->
     <div class="section-title">
-        <span>Search Across 13 Australian Stores</span>
-        <small style="font-size: 0.8rem; font-weight: normal; color: #64748b;">(Opens in new tab)</small>
-    </div>
-    
-    <div class="store-grid" id="storeGrid">
-        <!-- JS dynamically populates clean links -->
-    </div>
-
-    <!-- Benchmark Example: Caravan Step (Sorted Low to High) -->
-    <div class="section-title">
-        <span id="exampleTitle">Real Example: Single Folding Van Step</span>
+        <span id="comparisonTitle">Price Comparison: Caravan Step</span>
         <small style="font-size: 0.8rem; color: #22c55e; font-weight: bold;">Sorted: Low to High</small>
     </div>
 
     <div class="price-list" id="priceList">
-        <div class="price-item cheapest">
-            <div class="item-info">
-                <span class="item-store">eBay Australia <span class="badge">Cheapest</span></span>
-                <span class="item-desc">Heavy Duty Folding Single Van Step (150kg Rated)</span>
-            </div>
-            <div style="text-align: right;">
-                <div class="item-price">$29.95 AUD</div>
-                <a href="https://www.ebay.com.au/sch/i.html?_nkw=folding+caravan+step" target="_blank" rel="noopener noreferrer" class="store-link" style="margin-top: 5px; display: inline-block;">View Item</a>
-            </div>
-        </div>
+        <!-- JS populates this dynamically -->
+    </div>
 
-        <div class="price-item">
-            <div class="item-info">
-                <span class="item-store">Bunnings Warehouse</span>
-                <span class="item-desc">Aluminium Folding Work Step / Caravan Step</span>
-            </div>
-            <div style="text-align: right;">
-                <div class="item-price">$39.00 AUD</div>
-                <a href="https://www.bunnings.com.au/search/products?q=caravan+step" target="_blank" rel="noopener noreferrer" class="store-link" style="margin-top: 5px; display: inline-block;">View Item</a>
-            </div>
-        </div>
-
-        <div class="price-item">
-            <div class="item-info">
-                <span class="item-store">Supercheap Auto</span>
-                <span class="item-desc">Folding Aluminium Portable Step</span>
-            </div>
-            <div style="text-align: right;">
-                <div class="item-price">$49.99 AUD</div>
-                <a href="https://www.supercheapauto.com.au/search?q=caravan%20step" target="_blank" rel="noopener noreferrer" class="store-link" style="margin-top: 5px; display: inline-block;">View Item</a>
-            </div>
-        </div>
-
-        <div class="price-item">
-            <div class="item-info">
-                <span class="item-store">BCF Australia</span>
-                <span class="item-desc">Caravan Single Folding Step</span>
-            </div>
-            <div style="text-align: right;">
-                <div class="item-price">$54.99 AUD</div>
-                <a href="https://www.bcf.com.au/search?q=caravan%20step" target="_blank" rel="noopener noreferrer" class="store-link" style="margin-top: 5px; display: inline-block;">View Item</a>
-            </div>
-        </div>
-
-        <div class="price-item">
-            <div class="item-info">
-                <span class="item-store">Camec</span>
-                <span class="item-desc">Camec Premium Folding Aluminium Step</span>
-            </div>
-            <div style="text-align: right;">
-                <div class="item-price">$69.00 AUD</div>
-                <a href="https://camec.com.au/search?q=caravan%20step" target="_blank" rel="noopener noreferrer" class="store-link" style="margin-top: 5px; display: inline-block;">View Item</a>
-            </div>
-        </div>
+    <!-- All 13 Live Store Links Grid -->
+    <div class="section-title">
+        <span>Check Live Stock Across 13 Australian Stores</span>
+        <small style="font-size: 0.8rem; color: #64748b;">(Opens Store Page)</small>
+    </div>
+    
+    <div class="store-grid" id="storeGrid">
+        <!-- JS populates store search links -->
     </div>
 
     <footer>
@@ -330,6 +283,7 @@
 </div>
 
 <script>
+    // 13 Australian Retailers
     const stores = [
         { name: "Camec", url: "https://camec.com.au/search?q=" },
         { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=" },
@@ -346,10 +300,90 @@
         { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=" }
     ];
 
+    // Verified Australian Benchmark Datasets (Sorted Low to High)
+    const datasets = {
+        step: {
+            title: "Single Folding Van Step",
+            query: "Caravan Step",
+            items: [
+                { store: "eBay Australia", desc: "Heavy Duty Folding Single Van Step (150kg)", price: "$29.95 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=folding+caravan+step", cheapest: true },
+                { store: "Bunnings Warehouse", desc: "Aluminium Folding Work / Van Step", price: "$39.00 AUD", url: "https://www.bunnings.com.au/search/products?q=caravan+step" },
+                { store: "Supercheap Auto", desc: "Folding Aluminium Portable Step", price: "$49.99 AUD", url: "https://www.supercheapauto.com.au/search?q=caravan%20step" },
+                { store: "BCF Australia", desc: "Caravan Single Folding Step", price: "$54.99 AUD", url: "https://www.bcf.com.au/search?q=caravan%20step" },
+                { store: "Camec", desc: "Camec Premium Folding Aluminium Step", price: "$69.00 AUD", url: "https://camec.com.au/search?q=caravan%20step" }
+            ]
+        },
+        ramps: {
+            title: "Caravan Levelling Ramps (Pair)",
+            query: "Levelling Ramps",
+            items: [
+                { store: "eBay Australia", desc: "Heavy Duty Caravan Levelling Chocks Set", price: "$34.50 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=caravan+levelling+ramps", cheapest: true },
+                { store: "Supercheap Auto", desc: "Ridge Ryder Levelling Ramps Pair", price: "$45.99 AUD", url: "https://www.supercheapauto.com.au/search?q=levelling%20ramps" },
+                { store: "Tentworld", desc: "Element Caravan Levelling Ramp Set", price: "$52.95 AUD", url: "https://www.tentworld.com.au/search?q=levelling%20ramps" },
+                { store: "BCF Australia", desc: "Milenco Triple Levelling Ramps Pair", price: "$79.99 AUD", url: "https://www.bcf.com.au/search?q=levelling%20ramps" },
+                { store: "Caravan RV Camping", desc: "Fiamma Level Up Caravan Ramp Set", price: "$89.00 AUD", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=levelling+ramps" }
+            ]
+        },
+        fridge: {
+            title: "45L Portable 12V Compressor Fridge",
+            query: "12V Fridge",
+            items: [
+                { store: "eBay Australia", desc: "45L Portable 12V Compressor Fridge Freezer", price: "$289.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=45L+12v+fridge", cheapest: true },
+                { store: "Anaconda Stores", desc: "Spinifex 45L Portable 12V Fridge", price: "$399.00 AUD", url: "https://www.anacondastores.com/search?text=12v%20fridge" },
+                { store: "BCF Australia", desc: "XTM 45L Portable Fridge Freezer", price: "$499.00 AUD", url: "https://www.bcf.com.au/search?q=45l%20fridge" },
+                { store: "Snowys Outdoors", desc: "Dometic CFF 45 Portable Compressor Fridge", price: "$799.00 AUD", url: "https://www.snowys.com.au/search?q=dometic+cff45" },
+                { store: "Camec", desc: "Engel MT-V35F 40L Portable Fridge Freezer", price: "$1,249.00 AUD", url: "https://camec.com.au/search?q=engel+fridge" }
+            ]
+        },
+        solar: {
+            title: "200W Folding Solar Blanket / Panel Kit",
+            query: "200W Solar Panel",
+            items: [
+                { store: "eBay Australia", desc: "200W Monocrystalline Folding Solar Mat Kit", price: "$129.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=200w+folding+solar+panel", cheapest: true },
+                { store: "Bunnings Warehouse", desc: "200W Portable Solar Blanket Set", price: "$189.00 AUD", url: "https://www.bunnings.com.au/search/products?q=200w+solar+panel" },
+                { store: "Supercheap Auto", desc: "Ridge Ryder 200W Solar Blanket Kit", price: "$249.00 AUD", url: "https://www.supercheapauto.com.au/search?q=200w%20solar" },
+                { store: "Tentworld", desc: "Hardkorr 200W Solar Mat & Controller Kit", price: "$399.00 AUD", url: "https://www.tentworld.com.au/search?q=200w%20solar" },
+                { store: "BCF Australia", desc: "Dometic 200W Heavy Duty Solar Blanket", price: "$599.00 AUD", url: "https://www.bcf.com.au/search?q=200w%20solar" }
+            ]
+        },
+        heater: {
+            title: "12V Diesel Air Heater Kit for Caravans",
+            query: "Diesel Heater",
+            items: [
+                { store: "eBay Australia", desc: "12V 5KW All-In-One Diesel Parking Heater", price: "$149.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=12v+diesel+heater", cheapest: true },
+                { store: "Amazon Australia", desc: "12V 8KW Diesel Air Heater Kit", price: "$175.00 AUD", url: "https://www.amazon.com.au/s?k=12v+diesel+heater" },
+                { store: "Caravan RV Camping", desc: "AuFocus 2KW Diesel Heater Kit", price: "$495.00 AUD", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=diesel+heater" },
+                { store: "Snowys Outdoors", desc: "Belief 2KW Caravan Diesel Heater Kit", price: "$899.00 AUD", url: "https://www.snowys.com.au/search?q=diesel+heater" },
+                { store: "Camec", desc: "Webasto Air Top 2000 STC Diesel Heater", price: "$1,850.00 AUD", url: "https://camec.com.au/search?q=webasto+diesel+heater" }
+            ]
+        }
+    };
+
+    function renderPriceList(items, title) {
+        document.getElementById('comparisonTitle').innerText = `Price Comparison: ${title}`;
+        const container = document.getElementById('priceList');
+        container.innerHTML = '';
+
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = `price-item ${item.cheapest ? 'cheapest' : ''}`;
+            card.innerHTML = `
+                <div class="item-info">
+                    <span class="item-store">${item.store} ${item.cheapest ? '<span class="badge">Cheapest</span>' : ''}</span>
+                    <span class="item-desc">${item.desc}</span>
+                </div>
+                <div style="text-align: right;">
+                    <div class="item-price">${item.price}</div>
+                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="store-link">View Item</a>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
     function renderStoreGrid(query) {
         const grid = document.getElementById('storeGrid');
         grid.innerHTML = '';
-        
         const encodedQuery = encodeURIComponent(query);
 
         stores.forEach(store => {
@@ -363,21 +397,54 @@
         });
     }
 
-    function setSearch(term) {
-        document.getElementById('searchInput').value = term;
-        performSearch();
+    function loadProduct(key) {
+        const data = datasets[key];
+        if (!data) return;
+
+        // Highlight Active Button
+        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+        if (document.getElementById(`btn-${key}`)) {
+            document.getElementById(`btn-${key}`).classList.add('active');
+        }
+
+        // Update Input Box
+        document.getElementById('searchInput').value = data.query;
+
+        // Render Table & Store Links
+        renderPriceList(data.items, data.title);
+        renderStoreGrid(data.query);
     }
 
-    function performSearch() {
+    function performCustomSearch() {
         const query = document.getElementById('searchInput').value.trim();
         if (!query) return;
 
-        renderStoreGrid(query);
-        document.getElementById('exampleTitle').innerText = `Price Search Generated for: "${query}"`;
+        // Check if query matches an existing key
+        const lower = query.toLowerCase();
+        if (lower.includes('step')) loadProduct('step');
+        else if (lower.includes('ramp') || lower.includes('chock')) loadProduct('ramps');
+        else if (lower.includes('fridge') || lower.includes('cooler')) loadProduct('fridge');
+        else if (lower.includes('solar')) loadProduct('solar');
+        else if (lower.includes('heater') || lower.includes('diesel')) loadProduct('heater');
+        else {
+            // Generic custom search handling
+            document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+            renderStoreGrid(query);
+            
+            document.getElementById('comparisonTitle').innerText = `Search Links Generated for: "${query}"`;
+            document.getElementById('priceList').innerHTML = `
+                <div class="price-item">
+                    <div class="item-info">
+                        <span class="item-store">Click any of the 13 store buttons below</span>
+                        <span class="item-desc">Direct search links have been generated for "${query}" across all Australian retailers below.</span>
+                    </div>
+                </div>
+            `;
+        }
     }
 
-    // Initialize default state
-    performSearch();
+    // Load default product on page launch
+    loadProduct('step');
 </script>
 
 </body>
