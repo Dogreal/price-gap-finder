@@ -35,7 +35,7 @@
 
         header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         h1 {
@@ -128,11 +128,8 @@
             align-items: center;
         }
 
-        /* Benchmark Price List */
-        .price-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        /* Results / Benchmark Container */
+        .results-container {
             margin-bottom: 25px;
         }
 
@@ -144,6 +141,7 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             background: #fff;
+            margin-bottom: 10px;
         }
 
         .price-item.cheapest {
@@ -201,7 +199,20 @@
             opacity: 0.9;
         }
 
-        /* 13 Store Grid */
+        /* 13 Store Grid Category Layout */
+        .category-group {
+            margin-bottom: 20px;
+        }
+
+        .category-header {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #475569;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .store-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -241,40 +252,55 @@
         <p class="subtitle">Find the cheapest price across 13 Australian caravan & camping stores.</p>
     </header>
 
-    <!-- Search Input -->
+    <!-- General Search Input -->
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search product (e.g. Van Step, Fridge, Solar Mat)..." value="Caravan Step">
-        <button class="search-btn" onclick="performCustomSearch()">Find Prices</button>
+        <input type="text" id="searchInput" placeholder="Search any product (e.g. Solar Battery, Water Pump, Caravan Step)..." value="Solar Battery">
+        <button class="search-btn" onclick="performGeneralSearch()">Find Prices</button>
     </div>
 
-    <!-- Quick Suggestion Buttons -->
+    <!-- Quick Example Buttons -->
     <div class="quick-tags">
-        <span>Quick Comparisons:</span>
-        <button class="tag-btn active" id="btn-step" onclick="loadProduct('step')">Van Step</button>
-        <button class="tag-btn" id="btn-ramps" onclick="loadProduct('ramps')">Levelling Ramps</button>
-        <button class="tag-btn" id="btn-fridge" onclick="loadProduct('fridge')">12V Fridge</button>
-        <button class="tag-btn" id="btn-solar" onclick="loadProduct('solar')">Solar Panel</button>
-        <button class="tag-btn" id="btn-heater" onclick="loadProduct('heater')">Diesel Heater</button>
+        <span>Example Comparisons:</span>
+        <button class="tag-btn" id="btn-step" onclick="loadBenchmark('step')">Van Step</button>
+        <button class="tag-btn" id="btn-ramps" onclick="loadBenchmark('ramps')">Levelling Ramps</button>
+        <button class="tag-btn" id="btn-fridge" onclick="loadBenchmark('fridge')">12V Fridge</button>
+        <button class="tag-btn" id="btn-solar" onclick="loadBenchmark('solar')">200W Solar Panel</button>
+        <button class="tag-btn" id="btn-heater" onclick="loadBenchmark('heater')">Diesel Heater</button>
     </div>
 
-    <!-- Dynamic Low to High Comparison Table -->
+    <!-- Dynamic Section Title -->
     <div class="section-title">
-        <span id="comparisonTitle">Price Comparison: Caravan Step</span>
-        <small style="font-size: 0.8rem; color: #22c55e; font-weight: bold;">Sorted: Low to High</small>
+        <span id="resultsTitle">Price Gap Search Results</span>
+        <small id="resultsBadge" style="font-size: 0.8rem; color: #d97706; font-weight: bold;">13 Stores Search</small>
     </div>
 
-    <div class="price-list" id="priceList">
-        <!-- JS populates this dynamically -->
+    <!-- General Search Result Info / Benchmark Output -->
+    <div class="results-container" id="resultsContainer">
+        <!-- JS dynamically fills this -->
     </div>
 
-    <!-- All 13 Live Store Links Grid -->
+    <!-- 13 Store Direct Links Organized by Category -->
     <div class="section-title">
-        <span>Check Live Stock Across 13 Australian Stores</span>
+        <span>Compare Live Stock Across 13 Stores</span>
         <small style="font-size: 0.8rem; color: #64748b;">(Opens Store Page)</small>
     </div>
-    
-    <div class="store-grid" id="storeGrid">
-        <!-- JS populates store search links -->
+
+    <!-- Budget & Marketplaces -->
+    <div class="category-group">
+        <div class="category-header">1. Marketplaces & Deals (Lowest Initial Price)</div>
+        <div class="store-grid" id="grid-marketplaces"></div>
+    </div>
+
+    <!-- Major Auto & Hardware Retailers -->
+    <div class="category-group">
+        <div class="category-header">2. Major Camping, Auto & Hardware Retailers</div>
+        <div class="store-grid" id="grid-retailers"></div>
+    </div>
+
+    <!-- Caravan & Outdoor Specialists -->
+    <div class="category-group">
+        <div class="category-header">3. Specialist Caravan & RV Stores</div>
+        <div class="store-grid" id="grid-specialists"></div>
     </div>
 
     <footer>
@@ -283,25 +309,31 @@
 </div>
 
 <script>
-    // 13 Australian Retailers
-    const stores = [
-        { name: "Camec", url: "https://camec.com.au/search?q=" },
-        { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=" },
-        { name: "BCF Australia", url: "https://www.bcf.com.au/search?q=" },
-        { name: "Tentworld", url: "https://www.tentworld.com.au/search?q=" },
-        { name: "Snowys Outdoors", url: "https://www.snowys.com.au/search?q=" },
-        { name: "Anaconda Stores", url: "https://www.anacondastores.com/search?text=" },
-        { name: "Caravan RV Camping", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=" },
-        { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=" },
-        { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=" },
-        { name: "Gumtree Australia", url: "https://www.gumtree.com.au/s-search.html?keywords=" },
-        { name: "Facebook Marketplace", url: "https://www.facebook.com/marketplace/search/?query=" },
-        { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=" },
-        { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=" }
-    ];
+    // 13 Australian Retailers Categorized
+    const storeCategories = {
+        marketplaces: [
+            { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=" },
+            { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=" },
+            { name: "Facebook Marketplace", url: "https://www.facebook.com/marketplace/search/?query=" },
+            { name: "Gumtree Australia", url: "https://www.gumtree.com.au/s-search.html?keywords=" }
+        ],
+        retailers: [
+            { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=" },
+            { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=" },
+            { name: "BCF Australia", url: "https://www.bcf.com.au/search?q=" },
+            { name: "Anaconda Stores", url: "https://www.anacondastores.com/search?text=" },
+            { name: "Tentworld", url: "https://www.tentworld.com.au/search?q=" }
+        ],
+        specialists: [
+            { name: "Camec", url: "https://camec.com.au/search?q=" },
+            { name: "Snowys Outdoors", url: "https://www.snowys.com.au/search?q=" },
+            { name: "Caravan RV Camping", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=" },
+            { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=" }
+        ]
+    };
 
-    // Verified Australian Benchmark Datasets (Sorted Low to High)
-    const datasets = {
+    // Pre-configured Benchmark Datasets for the Example Buttons
+    const benchmarks = {
         step: {
             title: "Single Folding Van Step",
             query: "Caravan Step",
@@ -336,7 +368,7 @@
             ]
         },
         solar: {
-            title: "200W Folding Solar Blanket / Panel Kit",
+            title: "200W Folding Solar Panel / Mat Kit",
             query: "200W Solar Panel",
             items: [
                 { store: "eBay Australia", desc: "200W Monocrystalline Folding Solar Mat Kit", price: "$129.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=200w+folding+solar+panel", cheapest: true },
@@ -359,12 +391,78 @@
         }
     };
 
-    function renderPriceList(items, title) {
-        document.getElementById('comparisonTitle').innerText = `Price Comparison: ${title}`;
-        const container = document.getElementById('priceList');
+    function renderStoreGrid(query) {
+        const encodedQuery = encodeURIComponent(query);
+
+        ['marketplaces', 'retailers', 'specialists'].forEach(cat => {
+            const grid = document.getElementById(`grid-${cat}`);
+            grid.innerHTML = '';
+
+            storeCategories[cat].forEach(store => {
+                const card = document.createElement('div');
+                card.className = 'store-card';
+                card.innerHTML = `
+                    <span class="store-name">${store.name}</span>
+                    <a href="${store.url}${encodedQuery}" target="_blank" rel="noopener noreferrer" class="store-link">Find Price</a>
+                `;
+                grid.appendChild(card);
+            });
+        });
+    }
+
+    function performGeneralSearch() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (!query) return;
+
+        // Deselect example tag buttons
+        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+
+        // Update headers
+        document.getElementById('resultsTitle').innerText = `Price Search for: "${query}"`;
+        document.getElementById('resultsBadge').innerText = "13 Stores Loaded";
+
+        // Render Clean General Search Card
+        const container = document.getElementById('resultsContainer');
+        const encodedQuery = encodeURIComponent(query);
+
+        container.innerHTML = `
+            <div class="price-item cheapest">
+                <div class="item-info">
+                    <span class="item-store">🔍 Live Search Ready for "${query}"</span>
+                    <span class="item-desc">Click any store button below to instantly load exact product prices for <strong>"${query}"</strong> across all 13 Australian retailers.</span>
+                </div>
+                <div style="text-align: right;">
+                    <a href="https://www.ebay.com.au/sch/i.html?_nkw=${encodedQuery}" target="_blank" rel="noopener noreferrer" class="store-link">Start with eBay</a>
+                </div>
+            </div>
+        `;
+
+        // Update all 13 Store Buttons for this general query
+        renderStoreGrid(query);
+    }
+
+    function loadBenchmark(key) {
+        const data = benchmarks[key];
+        if (!data) return;
+
+        // Highlight Active Button
+        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+        if (document.getElementById(`btn-${key}`)) {
+            document.getElementById(`btn-${key}`).classList.add('active');
+        }
+
+        // Update Input Box
+        document.getElementById('searchInput').value = data.query;
+
+        // Update Headers
+        document.getElementById('resultsTitle').innerText = `Example Benchmark: ${data.title}`;
+        document.getElementById('resultsBadge').innerText = "Sorted Low to High";
+
+        // Render Benchmark Price List
+        const container = document.getElementById('resultsContainer');
         container.innerHTML = '';
 
-        items.forEach(item => {
+        data.items.forEach(item => {
             const card = document.createElement('div');
             card.className = `price-item ${item.cheapest ? 'cheapest' : ''}`;
             card.innerHTML = `
@@ -379,72 +477,20 @@
             `;
             container.appendChild(card);
         });
-    }
 
-    function renderStoreGrid(query) {
-        const grid = document.getElementById('storeGrid');
-        grid.innerHTML = '';
-        const encodedQuery = encodeURIComponent(query);
-
-        stores.forEach(store => {
-            const card = document.createElement('div');
-            card.className = 'store-card';
-            card.innerHTML = `
-                <span class="store-name">${store.name}</span>
-                <a href="${store.url}${encodedQuery}" target="_blank" rel="noopener noreferrer" class="store-link">Find Price</a>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    function loadProduct(key) {
-        const data = datasets[key];
-        if (!data) return;
-
-        // Highlight Active Button
-        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
-        if (document.getElementById(`btn-${key}`)) {
-            document.getElementById(`btn-${key}`).classList.add('active');
-        }
-
-        // Update Input Box
-        document.getElementById('searchInput').value = data.query;
-
-        // Render Table & Store Links
-        renderPriceList(data.items, data.title);
+        // Update Store Grid Links
         renderStoreGrid(data.query);
     }
 
-    function performCustomSearch() {
-        const query = document.getElementById('searchInput').value.trim();
-        if (!query) return;
-
-        // Check if query matches an existing key
-        const lower = query.toLowerCase();
-        if (lower.includes('step')) loadProduct('step');
-        else if (lower.includes('ramp') || lower.includes('chock')) loadProduct('ramps');
-        else if (lower.includes('fridge') || lower.includes('cooler')) loadProduct('fridge');
-        else if (lower.includes('solar')) loadProduct('solar');
-        else if (lower.includes('heater') || lower.includes('diesel')) loadProduct('heater');
-        else {
-            // Generic custom search handling
-            document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
-            renderStoreGrid(query);
-            
-            document.getElementById('comparisonTitle').innerText = `Search Links Generated for: "${query}"`;
-            document.getElementById('priceList').innerHTML = `
-                <div class="price-item">
-                    <div class="item-info">
-                        <span class="item-store">Click any of the 13 store buttons below</span>
-                        <span class="item-desc">Direct search links have been generated for "${query}" across all Australian retailers below.</span>
-                    </div>
-                </div>
-            `;
+    // Allow pressing "Enter" key in search box
+    document.getElementById('searchInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            performGeneralSearch();
         }
-    }
+    });
 
-    // Load default product on page launch
-    loadProduct('step');
+    // Default Load on launch
+    performGeneralSearch();
 </script>
 
 </body>
