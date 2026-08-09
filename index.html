@@ -8,6 +8,7 @@
         :root {
             --primary: #2d5a27; /* Vanlife Green */
             --accent: #d97706;  /* Orange */
+            --cheapest-btn: #16a34a; /* Green for lowest price button */
             --bg: #f8fafc;
             --card-bg: #ffffff;
             --text: #1e293b;
@@ -165,6 +166,7 @@
         .item-info {
             display: flex;
             flex-direction: column;
+            max-width: 60%;
         }
 
         .item-store {
@@ -178,27 +180,29 @@
             margin-top: 3px;
         }
 
-        .item-price {
-            font-size: 1.15rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
+        /* Price Action Buttons with Price Inside */
         .store-link {
             background: var(--accent);
             color: white;
             text-decoration: none;
-            padding: 8px 16px;
+            padding: 10px 18px;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             font-weight: bold;
             display: inline-block;
-            margin-top: 4px;
-            transition: opacity 0.2s;
+            transition: transform 0.1s, opacity 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .store-link.cheapest-btn {
+            background: var(--cheapest-btn);
         }
 
         .store-link:hover {
-            opacity: 0.9;
+            opacity: 0.92;
+            transform: translateY(-1px);
         }
 
         /* 13 Store Grid */
@@ -285,7 +289,7 @@
 </div>
 
 <script>
-    // All 13 Australian Stores ordered by general price tier (Budget/Marketplace -> Retail -> Specialist)
+    // All 13 Australian Stores ordered by general price tier
     const storeRegistry = [
         { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=", tier: "Marketplace (Typically Lowest Price)", cheapest: true },
         { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=", tier: "Marketplace / Budget Deals" },
@@ -302,7 +306,7 @@
         { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=", tier: "Caravan & RV Marketplace" }
     ];
 
-    // Pre-calculated Verified Benchmark Datasets for the Quick Buttons
+    // Pre-calculated Verified Benchmark Datasets with exact prices
     const benchmarks = {
         battery: {
             title: "100Ah Lithium LiFePO4 / Deep Cycle Solar Battery",
@@ -383,14 +387,21 @@
         items.forEach(item => {
             const card = document.createElement('div');
             card.className = `price-item ${item.cheapest ? 'cheapest' : ''}`;
+            
+            // Format price directly inside button
+            const buttonText = item.price.includes('$') 
+                ? `View ${item.price} — Checkout` 
+                : `View Deals (${item.price})`;
+
             card.innerHTML = `
                 <div class="item-info">
-                    <span class="item-store">${item.store} ${item.cheapest ? '<span class="badge">Cheapest Tier</span>' : ''}</span>
+                    <span class="item-store">${item.store} ${item.cheapest ? '<span class="badge">Cheapest</span>' : ''}</span>
                     <span class="item-desc">${item.desc}</span>
                 </div>
                 <div style="text-align: right;">
-                    <div class="item-price">${item.price}</div>
-                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="store-link">View Results & Checkout</a>
+                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="store-link ${item.cheapest ? 'cheapest-btn' : ''}">
+                        ${buttonText}
+                    </a>
                 </div>
             `;
             container.appendChild(card);
@@ -407,7 +418,7 @@
             card.className = 'store-card';
             card.innerHTML = `
                 <span class="store-name">${store.name}</span>
-                <a href="${store.url}${encodedQuery}" target="_blank" rel="noopener noreferrer" class="store-link">Find Price</a>
+                <a href="${store.url}${encodedQuery}" target="_blank" rel="noopener noreferrer" class="store-link" style="padding: 6px 12px; font-size: 0.8rem;">Find Price</a>
             `;
             grid.appendChild(card);
         });
@@ -423,10 +434,10 @@
 
         const encodedQuery = encodeURIComponent(query);
 
-        // Build a General 13-Store Low-to-High Comparison Table for ANY query
+        // Build a General 13-Store Low-to-High Comparison Table
         const generalResults = storeRegistry.map(store => ({
             store: store.name,
-            desc: `Live Product Results for "${query}"`,
+            desc: `Live Product Search for "${query}"`,
             price: store.tier,
             url: `${store.url}${encodedQuery}`,
             cheapest: store.cheapest || false
@@ -459,8 +470,8 @@
         }
     });
 
-    // Default Load: General Search for "Solar Battery"
-    executeGeneralSearch();
+    // Default Load on launch
+    loadBenchmark('battery');
 </script>
 
 </body>
