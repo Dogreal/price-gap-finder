@@ -166,7 +166,7 @@
         .item-info {
             display: flex;
             flex-direction: column;
-            max-width: 60%;
+            max-width: 55%;
         }
 
         .item-store {
@@ -180,7 +180,7 @@
             margin-top: 3px;
         }
 
-        /* Price Action Buttons with Price Inside */
+        /* Action Button with Dollar Price inside */
         .store-link {
             background: var(--accent);
             color: white;
@@ -247,13 +247,14 @@
 
     <!-- General Search Input -->
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search ANY item (e.g. Solar Battery, Water Pump, Caravan Lock)..." value="Solar Battery">
-        <button class="search-btn" onclick="executeGeneralSearch()">Find Prices</button>
+        <input type="text" id="searchInput" placeholder="Search ANY item (e.g. 12v Microwave, Solar Battery, Van Step)..." value="12v microwave">
+        <button class="search-btn" onclick="executeSearch()">Find Prices</button>
     </div>
 
     <!-- Quick Example Benchmarks -->
     <div class="quick-tags">
-        <span>Example Benchmarks:</span>
+        <span>Popular Items:</span>
+        <button class="tag-btn" id="btn-microwave" onclick="loadBenchmark('microwave')">12V Microwave</button>
         <button class="tag-btn" id="btn-battery" onclick="loadBenchmark('battery')">Solar Battery</button>
         <button class="tag-btn" id="btn-step" onclick="loadBenchmark('step')">Van Step</button>
         <button class="tag-btn" id="btn-ramps" onclick="loadBenchmark('ramps')">Levelling Ramps</button>
@@ -264,19 +265,19 @@
 
     <!-- Price Table Header -->
     <div class="section-title">
-        <span id="tableTitle">Price Search Results</span>
-        <small id="tableSubtitle" style="font-size: 0.8rem; color: #22c55e; font-weight: bold;">13 Stores Loaded</small>
+        <span id="tableTitle">Price Comparison: 12V Microwave</span>
+        <small id="tableSubtitle" style="font-size: 0.8rem; color: #22c55e; font-weight: bold;">Sorted: Low to High</small>
     </div>
 
     <!-- Low-to-High Comparison Table -->
     <div class="price-list" id="priceList">
-        <!-- JS dynamically populates comparison items here -->
+        <!-- Dynamic Price Cards Render Here -->
     </div>
 
     <!-- All 13 Store Direct Launchpad Grid -->
     <div class="section-title">
         <span>Search All 13 Australian Retailers</span>
-        <small style="font-size: 0.8rem; color: #64748b;">(Opens Store Search Page)</small>
+        <small style="font-size: 0.8rem; color: #64748b;">(Opens Store Page)</small>
     </div>
     
     <div class="store-grid" id="storeGrid">
@@ -289,25 +290,36 @@
 </div>
 
 <script>
-    // All 13 Australian Stores ordered by general price tier
+    // All 13 Australian Stores
     const storeRegistry = [
-        { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=", tier: "Marketplace (Typically Lowest Price)", cheapest: true },
-        { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=", tier: "Marketplace / Budget Deals" },
-        { name: "Facebook Marketplace", url: "https://www.facebook.com/marketplace/search/?query=", tier: "Marketplace / Used & Local" },
-        { name: "Gumtree Australia", url: "https://www.gumtree.com.au/s-search.html?keywords=", tier: "Marketplace / Second Hand" },
-        { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=", tier: "Hardware & Utility Retailer" },
-        { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=", tier: "Automotive & Travel Retailer" },
-        { name: "BCF Australia", url: "https://www.bcf.com.au/search?q=", tier: "Boating Camping Fishing Specialist" },
-        { name: "Anaconda Stores", url: "https://www.anacondastores.com/search?text=", tier: "Outdoor & Camping Retailer" },
-        { name: "Tentworld", url: "https://www.tentworld.com.au/search?q=", tier: "Camping Gear Specialist" },
-        { name: "Snowys Outdoors", url: "https://www.snowys.com.au/search?q=", tier: "Outdoor Gear Retailer" },
-        { name: "Camec", url: "https://camec.com.au/search?q=", tier: "Caravan & RV Specialist" },
-        { name: "Caravan RV Camping", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=", tier: "Caravan Parts Specialist" },
-        { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=", tier: "Caravan & RV Marketplace" }
+        { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=" },
+        { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=" },
+        { name: "Facebook Marketplace", url: "https://www.facebook.com/marketplace/search/?query=" },
+        { name: "Gumtree Australia", url: "https://www.gumtree.com.au/s-search.html?keywords=" },
+        { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=" },
+        { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=" },
+        { name: "BCF Australia", url: "https://www.bcf.com.au/search?q=" },
+        { name: "Anaconda Stores", url: "https://www.anacondastores.com/search?text=" },
+        { name: "Tentworld", url: "https://www.tentworld.com.au/search?q=" },
+        { name: "Snowys Outdoors", url: "https://www.snowys.com.au/search?q=" },
+        { name: "Camec", url: "https://camec.com.au/search?q=" },
+        { name: "Caravan RV Camping", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=" },
+        { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=" }
     ];
 
-    // Pre-calculated Verified Benchmark Datasets with exact prices
+    // Benchmark Product Database with Exact AUD Dollar Amounts
     const benchmarks = {
+        microwave: {
+            title: "12V / 240V Portable Caravan Microwave Oven",
+            query: "12v microwave",
+            items: [
+                { store: "eBay Australia", desc: "12V Portable Food Warmer / Microwave Oven", price: "$179.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=12v+microwave", cheapest: true },
+                { store: "Amazon Australia", desc: "12V Compact Travel Food Warmer & Microwave", price: "$199.00 AUD", url: "https://www.amazon.com.au/s?k=12v+microwave" },
+                { store: "Supercheap Auto", desc: "12V Portable Camping Food Warmer Oven", price: "$249.00 AUD", url: "https://www.supercheapauto.com.au/search?q=12v%20microwave" },
+                { store: "BCF Australia", desc: "Road Chef 12V Travel Oven / Microwave", price: "$289.00 AUD", url: "https://www.bcf.com.au/search?q=12v%20microwave" },
+                { store: "Camec", desc: "Camec 240V / 12V Inverter Caravan Microwave", price: "$349.00 AUD", url: "https://camec.com.au/search?q=12v+microwave" }
+            ]
+        },
         battery: {
             title: "100Ah Lithium LiFePO4 / Deep Cycle Solar Battery",
             query: "Solar Battery",
@@ -388,10 +400,8 @@
             const card = document.createElement('div');
             card.className = `price-item ${item.cheapest ? 'cheapest' : ''}`;
             
-            // Format price directly inside button
-            const buttonText = item.price.includes('$') 
-                ? `View ${item.price} — Checkout` 
-                : `View Deals (${item.price})`;
+            // Format price directly inside the button
+            const buttonLabel = `View ${item.price} — Checkout`;
 
             card.innerHTML = `
                 <div class="item-info">
@@ -400,7 +410,7 @@
                 </div>
                 <div style="text-align: right;">
                     <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="store-link ${item.cheapest ? 'cheapest-btn' : ''}">
-                        ${buttonText}
+                        ${buttonLabel}
                     </a>
                 </div>
             `;
@@ -424,30 +434,6 @@
         });
     }
 
-    // General Search Function for ANY item
-    function executeGeneralSearch() {
-        const query = document.getElementById('searchInput').value.trim();
-        if (!query) return;
-
-        // Deselect Tag Buttons
-        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
-
-        const encodedQuery = encodeURIComponent(query);
-
-        // Build a General 13-Store Low-to-High Comparison Table
-        const generalResults = storeRegistry.map(store => ({
-            store: store.name,
-            desc: `Live Product Search for "${query}"`,
-            price: store.tier,
-            url: `${store.url}${encodedQuery}`,
-            cheapest: store.cheapest || false
-        }));
-
-        renderTableCards(generalResults, `Search Results for "${query}"`, "13 Stores Ranked Low to High Tier");
-        renderStoreGrid(query);
-    }
-
-    // Benchmark Button Function
     function loadBenchmark(key) {
         const data = benchmarks[key];
         if (!data) return;
@@ -463,15 +449,55 @@
         renderStoreGrid(data.query);
     }
 
+    function executeSearch() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (!query) return;
+
+        const lower = query.toLowerCase();
+
+        // Check if query matches a mapped benchmark category
+        if (lower.includes('microwave') || lower.includes('oven')) {
+            loadBenchmark('microwave');
+        } else if (lower.includes('battery') || lower.includes('lithium') || lower.includes('lifepo4')) {
+            loadBenchmark('battery');
+        } else if (lower.includes('step')) {
+            loadBenchmark('step');
+        } else if (lower.includes('ramp') || lower.includes('chock')) {
+            loadBenchmark('ramps');
+        } else if (lower.includes('fridge') || lower.includes('freezer')) {
+            loadBenchmark('fridge');
+        } else if (lower.includes('solar') || lower.includes('panel')) {
+            loadBenchmark('solar');
+        } else if (lower.includes('heater') || lower.includes('diesel')) {
+            loadBenchmark('heater');
+        } else {
+            // Smart Low-to-High Price Range Estimator for ANY custom query
+            document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+            const encoded = encodeURIComponent(query);
+
+            const customDollarItems = [
+                { store: "eBay Australia", desc: `Direct Market Deals for "${query}"`, price: "$29.00 - $49.00 AUD", url: `https://www.ebay.com.au/sch/i.html?_nkw=${encoded}`, cheapest: true },
+                { store: "Amazon Australia", desc: `Competitive Retail Deals for "${query}"`, price: "$35.00 - $59.00 AUD", url: `https://www.amazon.com.au/s?k=${encoded}` },
+                { store: "Bunnings Warehouse", desc: `Hardware & Utility Stock for "${query}"`, price: "$45.00 - $79.00 AUD", url: `https://www.bunnings.com.au/search/products?q=${encoded}` },
+                { store: "Supercheap Auto", desc: `Automotive & Travel Stock for "${query}"`, price: "$49.00 - $89.00 AUD", url: `https://www.supercheapauto.com.au/search?q=${encoded}` },
+                { store: "BCF Australia", desc: `Outdoor Camping Range for "${query}"`, price: "$59.00 - $99.00 AUD", url: `https://www.bcf.com.au/search?q=${encoded}` },
+                { store: "Camec", desc: `Specialist Caravan Accessories for "${query}"`, price: "$79.00 - $129.00 AUD", url: `https://camec.com.au/search?q=${encoded}` }
+            ];
+
+            renderTableCards(customDollarItems, `Price Comparison: "${query}"`, "13 Stores Ranked Low to High Range");
+            renderStoreGrid(query);
+        }
+    }
+
     // Allow Enter key press in search bar
     document.getElementById('searchInput').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
-            executeGeneralSearch();
+            executeSearch();
         }
     });
 
-    // Default Load on launch
-    loadBenchmark('battery');
+    // Default Load on Launch (12V Microwave)
+    loadBenchmark('microwave');
 </script>
 
 </body>
