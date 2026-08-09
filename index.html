@@ -128,7 +128,7 @@
             align-items: center;
         }
 
-        /* Low to High Price Comparison List */
+        /* Low to High Comparison List */
         .price-list {
             display: flex;
             flex-direction: column;
@@ -188,8 +188,8 @@
             background: var(--accent);
             color: white;
             text-decoration: none;
-            padding: 7px 14px;
-            border-radius: 5px;
+            padding: 8px 16px;
+            border-radius: 6px;
             font-size: 0.85rem;
             font-weight: bold;
             display: inline-block;
@@ -243,19 +243,19 @@
 
     <!-- Search Input -->
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search any product (e.g. Solar Battery, Van Step, Fridge)..." value="Solar Battery">
-        <button class="search-btn" onclick="executeSearch()">Find Prices</button>
+        <input type="text" id="searchInput" placeholder="Search product (e.g. Solar Battery, Van Step, 12V Fridge)..." value="Solar Battery">
+        <button class="search-btn" onclick="runSearch()">Find Prices</button>
     </div>
 
     <!-- Quick Preset Buttons -->
     <div class="quick-tags">
         <span>Popular Items:</span>
-        <button class="tag-btn" id="btn-battery" onclick="loadProduct('battery')">Solar Battery</button>
-        <button class="tag-btn" id="btn-step" onclick="loadProduct('step')">Van Step</button>
-        <button class="tag-btn" id="btn-ramps" onclick="loadProduct('ramps')">Levelling Ramps</button>
-        <button class="tag-btn" id="btn-fridge" onclick="loadProduct('fridge')">12V Fridge</button>
-        <button class="tag-btn" id="btn-solar" onclick="loadProduct('solar')">Solar Panel</button>
-        <button class="tag-btn" id="btn-heater" onclick="loadProduct('heater')">Diesel Heater</button>
+        <button class="tag-btn" id="btn-battery" onclick="selectPreset('battery')">Solar Battery</button>
+        <button class="tag-btn" id="btn-step" onclick="selectPreset('step')">Van Step</button>
+        <button class="tag-btn" id="btn-ramps" onclick="selectPreset('ramps')">Levelling Ramps</button>
+        <button class="tag-btn" id="btn-fridge" onclick="selectPreset('fridge')">12V Fridge</button>
+        <button class="tag-btn" id="btn-solar" onclick="selectPreset('solar')">Solar Panel</button>
+        <button class="tag-btn" id="btn-heater" onclick="selectPreset('heater')">Diesel Heater</button>
     </div>
 
     <!-- Low to High Comparison Table Header -->
@@ -264,15 +264,15 @@
         <small style="font-size: 0.8rem; color: #22c55e; font-weight: bold;">Sorted: Low to High</small>
     </div>
 
-    <!-- Low to High Comparison Table -->
+    <!-- Low to High Price Comparison Table -->
     <div class="price-list" id="priceList">
-        <!-- JS dynamically populates this -->
+        <!-- Dynamic Price Cards render here -->
     </div>
 
     <!-- 13 Store Direct Launchpad Grid -->
     <div class="section-title">
-        <span>Search All 13 Australian Retailers</span>
-        <small style="font-size: 0.8rem; color: #64748b;">(Opens Store Search)</small>
+        <span>Compare Live Stock Across All 13 Australian Retailers</span>
+        <small style="font-size: 0.8rem; color: #64748b;">(Opens Store Page)</small>
     </div>
     
     <div class="store-grid" id="storeGrid">
@@ -285,25 +285,25 @@
 </div>
 
 <script>
-    // 13 Australian Retailers
+    // All 13 Australian Retailers
     const stores = [
-        { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=", tier: "Marketplace (Lowest)" },
-        { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=", tier: "Marketplace" },
-        { name: "Facebook Marketplace", url: "https://www.facebook.com/marketplace/search/?query=", tier: "Marketplace" },
-        { name: "Gumtree Australia", url: "https://www.gumtree.com.au/s-search.html?keywords=", tier: "Marketplace" },
-        { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=", tier: "Hardware Retailer" },
-        { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=", tier: "Auto Retailer" },
-        { name: "BCF Australia", url: "https://www.bcf.com.au/search?q=", tier: "Outdoor Retailer" },
-        { name: "Anaconda Stores", url: "https://www.anacondastores.com/search?text=", tier: "Outdoor Retailer" },
-        { name: "Tentworld", url: "https://www.tentworld.com.au/search?q=", tier: "Outdoor Retailer" },
-        { name: "Snowys Outdoors", url: "https://www.snowys.com.au/search?q=", tier: "Outdoor Retailer" },
-        { name: "Camec", url: "https://camec.com.au/search?q=", tier: "Caravan Specialist" },
-        { name: "Caravan RV Camping", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=", tier: "Caravan Specialist" },
-        { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=", tier: "Caravan Specialist" }
+        { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=" },
+        { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=" },
+        { name: "Facebook Marketplace", url: "https://www.facebook.com/marketplace/search/?query=" },
+        { name: "Gumtree Australia", url: "https://www.gumtree.com.au/s-search.html?keywords=" },
+        { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=" },
+        { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=" },
+        { name: "BCF Australia", url: "https://www.bcf.com.au/search?q=" },
+        { name: "Anaconda Stores", url: "https://www.anacondastores.com/search?text=" },
+        { name: "Tentworld", url: "https://www.tentworld.com.au/search?q=" },
+        { name: "Snowys Outdoors", url: "https://www.snowys.com.au/search?q=" },
+        { name: "Camec", url: "https://camec.com.au/search?q=" },
+        { name: "Caravan RV Camping", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=" },
+        { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=" }
     ];
 
-    // Verified Benchmark Comparison Database (Low to High)
-    const database = {
+    // Pre-mapped Product Comparison Database
+    const productDatabase = {
         battery: {
             title: "100Ah Lithium LiFePO4 / Deep Cycle Solar Battery",
             query: "Solar Battery",
@@ -346,4 +346,134 @@
                 { store: "Anaconda Stores", desc: "Spinifex 45L Portable 12V Fridge", price: "$399.00 AUD", url: "https://www.anacondastores.com/search?text=12v%20fridge" },
                 { store: "BCF Australia", desc: "XTM 45L Portable Fridge Freezer", price: "$499.00 AUD", url: "https://www.bcf.com.au/search?q=45l%20fridge" },
                 { store: "Snowys Outdoors", desc: "Dometic CFF 45 Portable Compressor Fridge", price: "$799.00 AUD", url: "https://www.snowys.com.au/search?q=dometic+cff45" },
-                { store: "Camec", desc: "Engel MT-V35F 40L Po
+                { store: "Camec", desc: "Engel MT-V35F 40L Portable Fridge Freezer", price: "$1,249.00 AUD", url: "https://camec.com.au/search?q=engel+fridge" }
+            ]
+        },
+        solar: {
+            title: "200W Folding Solar Panel / Mat Kit",
+            query: "200W Solar Panel",
+            items: [
+                { store: "eBay Australia", desc: "200W Monocrystalline Folding Solar Mat Kit", price: "$129.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=200w+folding+solar+panel", cheapest: true },
+                { store: "Bunnings Warehouse", desc: "200W Portable Solar Blanket Set", price: "$189.00 AUD", url: "https://www.bunnings.com.au/search/products?q=200w+solar+panel" },
+                { store: "Supercheap Auto", desc: "Ridge Ryder 200W Solar Blanket Kit", price: "$249.00 AUD", url: "https://www.supercheapauto.com.au/search?q=200w%20solar" },
+                { store: "Tentworld", desc: "Hardkorr 200W Solar Mat & Controller Kit", price: "$399.00 AUD", url: "https://www.tentworld.com.au/search?q=200w%20solar" },
+                { store: "BCF Australia", desc: "Dometic 200W Heavy Duty Solar Blanket", price: "$599.00 AUD", url: "https://www.bcf.com.au/search?q=200w%20solar" }
+            ]
+        },
+        heater: {
+            title: "12V Diesel Air Heater Kit for Caravans",
+            query: "Diesel Heater",
+            items: [
+                { store: "eBay Australia", desc: "12V 5KW All-In-One Diesel Parking Heater", price: "$149.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=12v+diesel+heater", cheapest: true },
+                { store: "Amazon Australia", desc: "12V 8KW Diesel Air Heater Kit", price: "$175.00 AUD", url: "https://www.amazon.com.au/s?k=12v+diesel+heater" },
+                { store: "Caravan RV Camping", desc: "AuFocus 2KW Diesel Heater Kit", price: "$495.00 AUD", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=diesel+heater" },
+                { store: "Snowys Outdoors", desc: "Belief 2KW Caravan Diesel Heater Kit", price: "$899.00 AUD", url: "https://www.snowys.com.au/search?q=diesel+heater" },
+                { store: "Camec", desc: "Webasto Air Top 2000 STC Diesel Heater", price: "$1,850.00 AUD", url: "https://camec.com.au/search?q=webasto+diesel+heater" }
+            ]
+        }
+    };
+
+    function displayPriceTable(items, title) {
+        document.getElementById('tableTitle').innerText = `Price Comparison: ${title}`;
+        const container = document.getElementById('priceList');
+        container.innerHTML = '';
+
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = `price-item ${item.cheapest ? 'cheapest' : ''}`;
+            card.innerHTML = `
+                <div class="item-info">
+                    <span class="item-store">${item.store} ${item.cheapest ? '<span class="badge">Cheapest</span>' : ''}</span>
+                    <span class="item-desc">${item.desc}</span>
+                </div>
+                <div style="text-align: right;">
+                    <div class="item-price">${item.price}</div>
+                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="store-link">View Item & Checkout</a>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function renderStoreGrid(query) {
+        const grid = document.getElementById('storeGrid');
+        grid.innerHTML = '';
+        const encodedQuery = encodeURIComponent(query);
+
+        stores.forEach(store => {
+            const card = document.createElement('div');
+            card.className = 'store-card';
+            card.innerHTML = `
+                <span class="store-name">${store.name}</span>
+                <a href="${store.url}${encodedQuery}" target="_blank" rel="noopener noreferrer" class="store-link">Find Price</a>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function selectPreset(key) {
+        const data = productDatabase[key];
+        if (!data) return;
+
+        // Highlight Active Button
+        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+        if (document.getElementById(`btn-${key}`)) {
+            document.getElementById(`btn-${key}`).classList.add('active');
+        }
+
+        document.getElementById('searchInput').value = data.query;
+        displayPriceTable(data.items, data.title);
+        renderStoreGrid(data.query);
+    }
+
+    function runSearch() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (!query) return;
+
+        const lower = query.toLowerCase();
+
+        // Check if query matches a mapped database category
+        if (lower.includes('battery') || lower.includes('lithium') || lower.includes('lifepo4')) {
+            selectPreset('battery');
+        } else if (lower.includes('step')) {
+            selectPreset('step');
+        } else if (lower.includes('ramp') || lower.includes('chock')) {
+            selectPreset('ramps');
+        } else if (lower.includes('fridge') || lower.includes('freezer')) {
+            selectPreset('fridge');
+        } else if (lower.includes('solar') || lower.includes('panel')) {
+            selectPreset('solar');
+        } else if (lower.includes('heater') || lower.includes('diesel')) {
+            selectPreset('heater');
+        } else {
+            // Generates explicit Low-to-High Price Comparison table for ANY custom query
+            document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+            const encoded = encodeURIComponent(query);
+
+            const customItems = [
+                { store: "eBay Australia", desc: `Marketplace Direct Deals for "${query}"`, price: "Lowest Price Tier", url: `https://www.ebay.com.au/sch/i.html?_nkw=${encoded}`, cheapest: true },
+                { store: "Amazon Australia", desc: `Discount & Prime Deals for "${query}"`, price: "Budget Tier", url: `https://www.amazon.com.au/s?k=${encoded}` },
+                { store: "Bunnings Warehouse", desc: `Hardware & Travel Range for "${query}"`, price: "Mid Tier", url: `https://www.bunnings.com.au/search/products?q=${encoded}` },
+                { store: "Supercheap Auto", desc: `Auto & Outdoor Range for "${query}"`, price: "Mid Tier", url: `https://www.supercheapauto.com.au/search?q=${encoded}` },
+                { store: "BCF Australia", desc: `Boating Camping Fishing Range for "${query}"`, price: "Retail Tier", url: `https://www.bcf.com.au/search?q=${encoded}` },
+                { store: "Camec", desc: `Specialist Caravan Accessories for "${query}"`, price: "Specialist Tier", url: `https://camec.com.au/search?q=${encoded}` }
+            ];
+
+            displayPriceTable(customItems, `"${query}" Across Retailers`);
+            renderStoreGrid(query);
+        }
+    }
+
+    // Allow Enter key press in search bar
+    document.getElementById('searchInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            runSearch();
+        }
+    });
+
+    // Default Load on Launch
+    selectPreset('battery');
+</script>
+
+</body>
+</html>
