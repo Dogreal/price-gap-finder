@@ -1,1 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Gap Finder - Retire To Vanlife</title>
+    <style>
+        :root {
+            --primary: #2d5a27; /* Vanlife Green */
+            --accent: #d97706;  /* Warm Orange */
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+
+        p.subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-top: 0;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 14px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        button.search-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.search-btn:hover {
+            background-color: #1e3e1a;
+        }
+
+        .quick-tags {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .quick-tags span {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #64748b;
+        }
+
+        .tag-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .store-card {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .store-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .store-link {
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .store-link:hover {
+            opacity: 0.9;
+        }
+
+        /* Benchmark Section */
+        .price-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .price-item.cheapest {
+            border: 2px solid #22c55e;
+            background-color: #f0fdf4;
+        }
+
+        .badge {
+            background: #22c55e;
+            color: white;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-store {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .item-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .item-price {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>⭐ Price Gap Finder</h1>
+        <p class="subtitle">Compare prices across 13 Australian caravan & camping stores.</p>
+    </header>
+
+    <!-- Search Section -->
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Enter product (e.g., Folding Van Step)..." value="Caravan Step">
+        <button class="search-btn" onclick="performSearch()">Find Price Gaps</button>
+    </div>
+
+    <div class="quick-tags">
+        <span>Popular Searches:</span>
+        <button class="tag-btn" onclick="setSearch('Caravan Step')">Van Step</button>
+        <button class="tag-btn" onclick="setSearch('Levelling Ramps')">Levelling Ramps</button>
+        <button class="tag-btn" onclick="setSearch('12v Portable Fridge')">12V Fridge</button>
+        <button class="tag-btn" onclick="setSearch('200W Solar Panel')">Solar Panel</button>
+        <button class="tag-btn" onclick="setSearch('Diesel Heater')">Diesel Heater</button>
+    </div>
+
+    <!-- Live Store Search Links Grid -->
+    <div class="section-title">
+        <span>Search Across 13 Australian Stores</span>
+        <small style="font-size: 0.8rem; font-weight: normal; color: #64748b;">(Opens in new tab)</small>
+    </div>
+    
+    <div class="store-grid" id="storeGrid">
+        <!-- JS dynamically populates clean links -->
+    </div>
+
+    <!-- Benchmark Example: Caravan Step (Sorted Low to High) -->
+    <div class="section-title">
+        <span id="exampleTitle">Real Example: Single Folding Van Step</span>
+        <small style="font-size: 0.8rem; color: #22c55e; font-weight: bold;">Sorted: Low to High</small>
+    </div>
+
+    <div class="price-list" id="priceList">
+        <div class="price-item cheapest">
+            <div class="item-info">
+                <span class="item-store">eBay Australia <span class="badge">Cheapest</span></span>
+                <span class="item-desc">Heavy Duty Folding Single Van Step (150kg Rated)</span>
+            </div>
+            <div style="text-align: right;">
+                <div class="item-price">$29.95 AUD</div>
+                <a href="https://www.ebay.com.au/sch/i.html?_nkw=folding+caravan+step" target="_blank" rel="noopener noreferrer" class="store-link" style="margin-top: 5px; display: inline-block;">View Item</a>
+            </div>
+        </div>
+
+        <div class="price-item">
+            <div class="item-info">
+                <span class="item-store">Bunnings Warehouse</span>
+                <span class="item-desc">Aluminium Folding Work Step / Caravan Step</span>
+            </div>
+            <div style="text-align: right;">
+                <div class="item-price">$39.00 AUD</div>
+                <a href="https://www.bunnings.com.au/search/products?q=caravan+step" target="_blank" rel="noopener noreferrer" class="store-link" style="margin-top: 5px; display: inline-block;">View Item</a>
+            </div>
+        </div>
+
+        <div class="price-item">
+            <div class="item-info">
+                <span class="item-store">Supercheap Auto</span>
+                <span class="item-desc">Folding Aluminium Portable Step</span>
+            </div>
+            <div style="text-align: right;">
+                <div class="item-price">$49.99 AUD</div>
+                <a href="https://www.supercheapauto.com.au/search?q=caravan%20step" target="_blank" rel="noopener noreferrer" class="store-link" style="margin-top: 5px; display: inline-block;">View Item</a>
+            </div>
+        </div>
+
+        <div class="price-item">
+            <div class="item-info">
+                <span class="item-store">BCF Australia</span>
+                <span class="item-desc">Caravan Single Folding Step</span>
+            </div>
+            <div style="text-align: right;">
+                <div class="item-price">$54.99 AUD</div>
+                <a href="https://www.bcf.com.au/search?q=caravan%20step" target="_blank" rel="noopener noreferrer" class="store-link" style="margin-top: 5px; display: inline-block;">View Item</a>
+            </div>
+        </div>
+
+        <div class="price-item">
+            <div class="item-info">
+                <span class="item-store">Camec</span>
+                <span class="item-desc">Camec Premium Folding Aluminium Step</span>
+            </div>
+            <div style="text-align: right;">
+                <div class="item-price">$69.00 AUD</div>
+                <a href="https://camec.com.au/search?q=caravan%20step" target="_blank" rel="noopener noreferrer" class="store-link" style="margin-top: 5px; display: inline-block;">View Item</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Retire To Vanlife — Helping Grey Nomads Save Money on Gear</p>
+    </footer>
+</div>
+
+<script>
+    const stores = [
+        { name: "Camec", url: "https://camec.com.au/search?q=" },
+        { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=" },
+        { name: "BCF Australia", url: "https://www.bcf.com.au/search?q=" },
+        { name: "Tentworld", url: "https://www.tentworld.com.au/search?q=" },
+        { name: "Snowys Outdoors", url: "https://www.snowys.com.au/search?q=" },
+        { name: "Anaconda Stores", url: "https://www.anacondastores.com/search?text=" },
+        { name: "Caravan RV Camping", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=" },
+        { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=" },
+        { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=" },
+        { name: "Gumtree Australia", url: "https://www.gumtree.com.au/s-search.html?keywords=" },
+        { name: "Facebook Marketplace", url: "https://www.facebook.com/marketplace/search/?query=" },
+        { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=" },
+        { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=" }
+    ];
+
+    function renderStoreGrid(query) {
+        const grid = document.getElementById('storeGrid');
+        grid.innerHTML = '';
+        
+        const encodedQuery = encodeURIComponent(query);
+
+        stores.forEach(store => {
+            const card = document.createElement('div');
+            card.className = 'store-card';
+            card.innerHTML = `
+                <span class="store-name">${store.name}</span>
+                <a href="${store.url}${encodedQuery}" target="_blank" rel="noopener noreferrer" class="store-link">Find Price</a>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function setSearch(term) {
+        document.getElementById('searchInput').value = term;
+        performSearch();
+    }
+
+    function performSearch() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (!query) return;
+
+        renderStoreGrid(query);
+        document.getElementById('exampleTitle').innerText = `Price Search Generated for: "${query}"`;
+    }
+
+    // Initialize default state
+    performSearch();
+</script>
+
+</body>
+</html>
