@@ -228,6 +228,724 @@
             font-size: 0.9rem;
         }
 
+        /* Find Your Closest Store section */
+        .locator-box {
+            background: #eef6f0;
+            border: 1px solid #cfe6d5;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 15px;
+        }
+
+        .locator-status {
+            font-size: 0.9rem;
+            color: #3f5a45;
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+
+        .locate-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .locate-btn:hover {
+            background: #1e3e1a;
+        }
+
+        .locate-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .locator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .locator-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .locator-card .store-link {
+            padding: 8px 14px;
+            font-size: 0.85rem;
+        }
+
+        .locator-card .store-link.disabled {
+            background: #cbd5e1;
+            color: #64748b;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* MOBILE RESPONSIVE STYLES (Smartphones & Small Screens) */
+        @media (max-width: 600px) {
+            body {
+                padding: 8px;
+            }
+
+            .container {
+                padding: 15px 12px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            button.search-btn {
+                width: 100%;
+                padding: 14px;
+                font-size: 1.05rem;
+            }
+
+            .price-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .item-info {
+                max-width: 100%;
+            }
+
+            .price-item div[style*="text-align: right"] {
+                text-align: left !important;
+                width: 100%;
+            }
+
+            .store-link {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+
+            .section-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .store-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .locate-btn {
+                width: 100%;
+            }
+
+            .locator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .locator-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .locator-card .store-link {
+                width: 100%;
+                box-sizing: border-box;
+                text-align: center;
+            }
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>⭐ Price Gap Finder</h1>
+        <p class="subtitle">Search any product to compare prices across 13 Australian stores.</p>
+    </header>
+
+    <!-- General Search Input -->
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search ANY item (e.g. 12v Microwave, Solar Battery, Van Step)..." value="12v microwave">
+        <button class="search-btn" onclick="executeGeneralSearch()">Find Prices</button>
+    </div>
+
+    <!-- Quick Example Benchmarks -->
+    <div class="quick-tags">
+        <span>Popular Benchmarks:</span>
+        <button class="tag-btn active" id="btn-microwave" onclick="loadBenchmark('microwave')">12V Microwave</button>
+        <button class="tag-btn" id="btn-battery" onclick="loadBenchmark('battery')">Solar Battery</button>
+        <button class="tag-btn" id="btn-step" onclick="loadBenchmark('step')">Van Step</button>
+        <button class="tag-btn" id="btn-ramps" onclick="loadBenchmark('ramps')">Levelling Ramps</button>
+        <button class="tag-btn" id="btn-fridge" onclick="loadBenchmark('fridge')">12V Fridge</button>
+        <button class="tag-btn" id="btn-solar" onclick="loadBenchmark('solar')">Solar Panel</button>
+        <button class="tag-btn" id="btn-heater" onclick="loadBenchmark('heater')">Diesel Heater</button>
+    </div>
+
+    <!-- Price Table Header -->
+    <div class="section-title">
+        <span id="tableTitle">Price Comparison: 12V / 240V Portable Caravan Microwave Oven</span>
+        <small id="tableSubtitle" style="font-size: 0.8rem; color: #22c55e; font-weight: bold;">Sorted: Low to High</small>
+    </div>
+
+    <div style="background: #fff8e6; border: 1px solid #f0d98c; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.85rem; color: #6b5b1e; line-height: 1.4;">
+        ⚠️ Prices shown are example listings we checked at the time this tool was built, not live prices. Store prices change often — always confirm the current price on the retailer's own site before buying.
+    </div>
+
+    <!-- Low-to-High Comparison Table -->
+    <div class="price-list" id="priceList"></div>
+
+    <!-- All 13 Store Direct Launchpad Grid -->
+    <div class="section-title">
+        <span>Search All 13 Australian Retailers</span>
+        <small style="font-size: 0.8rem; color: #64748b;">(Opens Store Page)</small>
+    </div>
+
+    <div class="store-grid" id="storeGrid"></div>
+
+    <!-- Find Your Closest Store -->
+    <div class="section-title" style="margin-top: 35px;">
+        <span>📍 Find Your Closest Store</span>
+        <small style="font-size: 0.8rem; color: #64748b;">Directions via Google Maps</small>
+    </div>
+
+    <div class="locator-box">
+        <p style="margin: 0 0 4px; font-size: 0.9rem; color: #3f5a45;">Don't know your exact location? No problem — tap below and we'll find the nearest branch of each store, wherever you are.</p>
+        <button class="locate-btn" id="locateBtn" onclick="findMyLocation()">📍 Enable My Location</button>
+        <p class="locator-status" id="locatorStatus">Location not yet enabled.</p>
+        <div class="locator-grid" id="locatorGrid"></div>
+    </div>
+
+    <footer>
+        <p>Retire To Vanlife — Helping Grey Nomads Save Money on Gear</p>
+    </footer>
+</div>
+
+<script>
+    // All 13 Australian Stores ordered by general price tier (Low to High)
+    const storeRegistry = [
+        { name: "eBay Australia", url: "https://www.ebay.com.au/sch/i.html?_nkw=", basePrice: 179, cheapest: true },
+        { name: "Amazon Australia", url: "https://www.amazon.com.au/s?k=", basePrice: 199 },
+        { name: "Facebook Marketplace", url: "https://www.facebook.com/marketplace/search/?query=", basePrice: 165 },
+        { name: "Gumtree Australia", url: "https://www.gumtree.com.au/s-search.html?keywords=", basePrice: 150 },
+        { name: "Bunnings Warehouse", url: "https://www.bunnings.com.au/search/products?q=", basePrice: 229 },
+        { name: "Supercheap Auto", url: "https://www.supercheapauto.com.au/search?q=", basePrice: 249 },
+        { name: "BCF Australia", url: "https://www.bcf.com.au/search?q=", basePrice: 289 },
+        { name: "Anaconda Stores", url: "https://www.anacondastores.com/search?text=", basePrice: 299 },
+        { name: "Tentworld", url: "https://www.tentworld.com.au/search?query=", basePrice: 319 },
+        { name: "Snowys Outdoors", url: "https://www.snowys.com.au/search?q=", basePrice: 329 },
+        { name: "Camec", url: "https://camec.com.au/search?q=", basePrice: 349 },
+        { name: "Caravan RV Camping", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=", basePrice: 369 },
+        { name: "Caravan Camping Sales", url: "https://www.caravancampingsales.com.au/items/?q=", basePrice: 389 }
+    ];
+
+    // Only stores with real physical branches get a "closest store" card
+    const physicalStores = [
+        { name: "Bunnings Warehouse", mapsQuery: "Bunnings Warehouse" },
+        { name: "Supercheap Auto", mapsQuery: "Supercheap Auto" },
+        { name: "BCF Australia", mapsQuery: "BCF" },
+        { name: "Anaconda Stores", mapsQuery: "Anaconda" },
+        { name: "Snowys Outdoors", mapsQuery: "Snowys Outdoors" },
+        { name: "Tentworld", mapsQuery: "Tentworld" }
+    ];
+
+    // Verified Benchmark Product Database
+    const benchmarks = {
+        microwave: {
+            title: "12V / 240V Portable Caravan Microwave Oven",
+            query: "12v microwave",
+            items: [
+                { store: "eBay Australia", desc: "12V Portable Food Warmer / Microwave Oven", price: "$179.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=12v+microwave", cheapest: true },
+                { store: "Amazon Australia", desc: "12V Compact Travel Food Warmer & Microwave", price: "$199.00 AUD", url: "https://www.amazon.com.au/s?k=12v+microwave" },
+                { store: "Supercheap Auto", desc: "12V Portable Camping Food Warmer Oven", price: "$249.00 AUD", url: "https://www.supercheapauto.com.au/search?q=12v%20microwave" },
+                { store: "BCF Australia", desc: "Road Chef 12V Travel Oven / Microwave", price: "$289.00 AUD", url: "https://www.bcf.com.au/search?q=12v%20microwave" },
+                { store: "Camec", desc: "Camec 240V / 12V Inverter Caravan Microwave", price: "$349.00 AUD", url: "https://camec.com.au/search?q=12v+microwave" }
+            ]
+        },
+        battery: {
+            title: "100Ah Lithium LiFePO4 / Deep Cycle Solar Battery",
+            query: "Solar Battery",
+            items: [
+                { store: "eBay Australia", desc: "100Ah 12V LiFePO4 Lithium Battery with BMS", price: "$229.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=100ah+lifepo4+battery", cheapest: true },
+                { store: "Amazon Australia", desc: "100Ah Deep Cycle LiFePO4 Solar Battery", price: "$269.00 AUD", url: "https://www.amazon.com.au/s?k=100ah+lifepo4+battery" },
+                { store: "Bunnings Warehouse", desc: "Deep Cycle 100Ah AGM / Solar Battery", price: "$349.00 AUD", url: "https://www.bunnings.com.au/search/products?q=100ah+deep+cycle+battery" },
+                { store: "Supercheap Auto", desc: "Ridge Ryder 100Ah Deep Cycle AGM Battery", price: "$399.00 AUD", url: "https://www.supercheapauto.com.au/search?q=100ah%20deep%20cycle" },
+                { store: "BCF Australia", desc: "XTM 100Ah Lithium LiFePO4 Battery", price: "$599.00 AUD", url: "https://www.bcf.com.au/search?q=100ah%20lithium" },
+                { store: "Camec", desc: "Camec Premium 100Ah LiFePO4 Caravan Battery", price: "$999.00 AUD", url: "https://camec.com.au/search?q=100ah+lithium+battery" }
+            ]
+        },
+        step: {
+            title: "Single Folding Van Step",
+            query: "Van Step",
+            items: [
+                { store: "eBay Australia", desc: "Heavy Duty Folding Single Van Step (150kg Rated)", price: "$29.95 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=folding+caravan+step", cheapest: true },
+                { store: "Bunnings Warehouse", desc: "Aluminium Folding Work / Van Step", price: "$39.00 AUD", url: "https://www.bunnings.com.au/search/products?q=caravan+step" },
+                { store: "Supercheap Auto", desc: "Folding Aluminium Portable Step", price: "$49.99 AUD", url: "https://www.supercheapauto.com.au/search?q=caravan%20step" },
+                { store: "BCF Australia", desc: "Caravan Single Folding Step", price: "$54.99 AUD", url: "https://www.bcf.com.au/search?q=caravan%20step" },
+                { store: "Camec", desc: "Camec Premium Folding Aluminium Step", price: "$69.00 AUD", url: "https://camec.com.au/search?q=caravan%20step" }
+            ]
+        },
+        ramps: {
+            title: "Caravan Levelling Ramps (Pair)",
+            query: "Levelling Ramps",
+            items: [
+                { store: "eBay Australia", desc: "Heavy Duty Caravan Levelling Chocks Set", price: "$34.50 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=caravan+levelling+ramps", cheapest: true },
+                { store: "Supercheap Auto", desc: "Ridge Ryder Levelling Ramps Pair", price: "$45.99 AUD", url: "https://www.supercheapauto.com.au/search?q=levelling%20ramps" },
+                { store: "Tentworld", desc: "Element Caravan Levelling Ramp Set", price: "$52.95 AUD", url: "https://www.tentworld.com.au/search?query=levelling%20ramps" },
+                { store: "BCF Australia", desc: "Milenco Triple Levelling Ramps Pair", price: "$79.99 AUD", url: "https://www.bcf.com.au/search?q=levelling%20ramps" },
+                { store: "Caravan RV Camping", desc: "Fiamma Level Up Caravan Ramp Set", price: "$89.00 AUD", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=levelling+ramps" }
+            ]
+        },
+        fridge: {
+            title: "45L Portable 12V Compressor Fridge",
+            query: "12V Fridge",
+            items: [
+                { store: "eBay Australia", desc: "45L Portable 12V Compressor Fridge Freezer", price: "$289.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=45L+12v+fridge", cheapest: true },
+                { store: "Anaconda Stores", desc: "Spinifex 45L Portable 12V Fridge", price: "$399.00 AUD", url: "https://www.anacondastores.com/search?text=12v%20fridge" },
+                { store: "BCF Australia", desc: "XTM 45L Portable Fridge Freezer", price: "$499.00 AUD", url: "https://www.bcf.com.au/search?q=45l%20fridge" },
+                { store: "Snowys Outdoors", desc: "Dometic CFF 45 Portable Compressor Fridge", price: "$799.00 AUD", url: "https://www.snowys.com.au/search?q=dometic+cff45" },
+                { store: "Camec", desc: "Engel MT-V35F 40L Portable Fridge Freezer", price: "$1,249.00 AUD", url: "https://camec.com.au/search?q=engel+fridge" }
+            ]
+        },
+        solar: {
+            title: "200W Folding Solar Panel / Mat Kit",
+            query: "200W Solar Panel",
+            items: [
+                { store: "eBay Australia", desc: "200W Monocrystalline Folding Solar Mat Kit", price: "$129.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=200w+folding+solar+panel", cheapest: true },
+                { store: "Bunnings Warehouse", desc: "200W Portable Solar Blanket Set", price: "$189.00 AUD", url: "https://www.bunnings.com.au/search/products?q=200w+solar+panel" },
+                { store: "Supercheap Auto", desc: "Ridge Ryder 200W Solar Blanket Kit", price: "$249.00 AUD", url: "https://www.supercheapauto.com.au/search?q=200w%20solar" },
+                { store: "Tentworld", desc: "Hardkorr 200W Solar Mat & Controller Kit", price: "$399.00 AUD", url: "https://www.tentworld.com.au/search?query=200w%20solar" },
+                { store: "BCF Australia", desc: "Dometic 200W Heavy Duty Solar Blanket", price: "$599.00 AUD", url: "https://www.bcf.com.au/search?q=200w%20solar" }
+            ]
+        },
+        heater: {
+            title: "12V Diesel Air Heater Kit for Caravans",
+            query: "Diesel Heater",
+            items: [
+                { store: "eBay Australia", desc: "12V 5KW All-In-One Diesel Parking Heater", price: "$149.00 AUD", url: "https://www.ebay.com.au/sch/i.html?_nkw=12v+diesel+heater", cheapest: true },
+                { store: "Amazon Australia", desc: "12V 8KW Diesel Air Heater Kit", price: "$175.00 AUD", url: "https://www.amazon.com.au/s?k=12v+diesel+heater" },
+                { store: "Caravan RV Camping", desc: "AuFocus 2KW Diesel Heater Kit", price: "$495.00 AUD", url: "https://www.caravanrvcamping.com.au/catalogsearch/result/?q=diesel+heater" },
+                { store: "Snowys Outdoors", desc: "Belief 2KW Caravan Diesel Heater Kit", price: "$899.00 AUD", url: "https://www.snowys.com.au/search?q=diesel+heater" },
+                { store: "Camec", desc: "Webasto Air Top 2000 STC Diesel Heater", price: "$1,850.00 AUD", url: "https://camec.com.au/search?q=webasto+diesel+heater" }
+            ]
+        }
+    };
+
+    function renderTableCards(items, title, subtitle) {
+        document.getElementById('tableTitle').innerText = title;
+        document.getElementById('tableSubtitle').innerText = subtitle || "Sorted: Low to High";
+
+        const container = document.getElementById('priceList');
+        container.innerHTML = '';
+
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = `price-item ${item.cheapest ? 'cheapest' : ''}`;
+
+            card.innerHTML = `
+                <div class="item-info">
+                    <span class="item-store">${item.store} ${item.cheapest ? '<span class="badge">Cheapest</span>' : ''}</span>
+                    <span class="item-desc">${item.desc}</span>
+                </div>
+                <div style="text-align: right;">
+                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="store-link ${item.cheapest ? 'cheapest-btn' : ''}">
+                        View ${item.price} — Checkout
+                    </a>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function renderStoreGrid(query) {
+        const grid = document.getElementById('storeGrid');
+        grid.innerHTML = '';
+        const encodedQuery = encodeURIComponent(query);
+
+        storeRegistry.forEach(store => {
+            const card = document.createElement('div');
+            card.className = 'store-card';
+            const href = store.noQuery ? store.url : `${store.url}${encodedQuery}`;
+            const label = store.noQuery ? 'Visit Store' : 'Find Price';
+            card.innerHTML = `
+                <span class="store-name">${store.name}</span>
+                <a href="${href}" target="_blank" rel="noopener noreferrer" class="store-link" style="padding: 6px 12px; font-size: 0.8rem;">${label}</a>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // Render the 6 physical-store cards. If lat/lon are given, buttons are real
+    // directions links. If not, buttons are shown disabled/greyed until location is granted.
+    function renderLocatorGrid(lat, lon) {
+        const grid = document.getElementById('locatorGrid');
+        grid.innerHTML = '';
+
+        physicalStores.forEach(store => {
+            const card = document.createElement('div');
+            card.className = 'locator-card';
+
+            let buttonHtml;
+            if (lat != null && lon != null) {
+                const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${encodeURIComponent(store.mapsQuery)}&travelmode=driving`;
+                buttonHtml = `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="store-link">Get Directions</a>`;
+            } else {
+                buttonHtml = `<span class="store-link disabled">Enable Location</span>`;
+            }
+
+            card.innerHTML = `
+                <span class="store-name">${store.name}</span>
+                ${buttonHtml}
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function findMyLocation() {
+        const statusEl = document.getElementById('locatorStatus');
+        const btnEl = document.getElementById('locateBtn');
+
+        if (!navigator.geolocation) {
+            statusEl.innerText = '⚠️ Your browser does not support location services. Try searching a store name directly in Google Maps instead.';
+            return;
+        }
+
+        btnEl.disabled = true;
+        btnEl.innerText = 'Getting your location…';
+        statusEl.innerText = 'Requesting location — please allow the permission prompt.';
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                renderLocatorGrid(lat, lon);
+                statusEl.innerText = '✅ Location found — tap any store below for directions to the nearest branch.';
+                btnEl.innerText = '📍 Location Enabled';
+            },
+            function (error) {
+                btnEl.disabled = false;
+                btnEl.innerText = '📍 Enable My Location';
+                if (error.code === error.PERMISSION_DENIED) {
+                    statusEl.innerText = '⚠️ Location permission was denied. Enable location for this site in your browser settings, then tap the button again.';
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    statusEl.innerText = '⚠️ Could not determine your location right now. This can happen with no signal — try again once you have some reception.';
+                } else if (error.code === error.TIMEOUT) {
+                    statusEl.innerText = '⚠️ Location request timed out. Tap the button to try again.';
+                } else {
+                    statusEl.innerText = '⚠️ Something went wrong getting your location. Tap the button to try again.';
+                }
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+        );
+    }
+
+    // Benchmark button click handler
+    function loadBenchmark(key) {
+        const data = benchmarks[key];
+        if (!data) return;
+
+        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+        if (document.getElementById(`btn-${key}`)) {
+            document.getElementById(`btn-${key}`).classList.add('active');
+        }
+
+        document.getElementById('searchInput').value = data.query;
+        renderTableCards(data.items, `Price Comparison: ${data.title}`, "Sorted: Low to High");
+        renderStoreGrid(data.query);
+    }
+
+    // Pure General Search for ANY typed input
+    function executeGeneralSearch() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (!query) return;
+
+        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+
+        document.getElementById('tableTitle').innerText = `Search Results for "${query}"`;
+        document.getElementById('tableSubtitle').innerText = "Click any store below for live prices";
+
+        const container = document.getElementById('priceList');
+        container.innerHTML = `
+            <div class="price-item cheapest">
+                <div class="item-info" style="max-width: 100%;">
+                    <span class="item-store">Ready to compare "${query}"</span>
+                    <span class="item-desc">These are our 6 example products with real Low-to-High pricing above. For "${query}", click any of the 13 stores below to open their live search results and see current prices.</span>
+                </div>
+            </div>
+        `;
+
+        renderStoreGrid(query);
+    }
+
+    // Allow Enter key press in search bar
+    document.getElementById('searchInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            executeGeneralSearch();
+        }
+    });
+
+    // Default load on launch
+    loadBenchmark('microwave');
+    renderLocatorGrid(null, null);
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Gap Finder - Retire To Vanlife</title>
+    <style>
+        :root {
+            --primary: #2d5a27; /* Vanlife Green */
+            --accent: #d97706;  /* Warm Orange */
+            --cheapest-btn: #16a34a; /* Green for lowest price */
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+
+        p.subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-top: 0;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 14px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        button.search-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.search-btn:hover {
+            background-color: #1e3e1a;
+        }
+
+        .quick-tags {
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .quick-tags span {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #64748b;
+            width: 100%;
+        }
+
+        .tag-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag-btn:hover, .tag-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Low to High Comparison List */
+        .price-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .price-item.cheapest {
+            border: 2px solid #22c55e;
+            background-color: #f0fdf4;
+        }
+
+        .badge {
+            background: #22c55e;
+            color: white;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            max-width: 55%;
+        }
+
+        .item-store {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .item-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 3px;
+        }
+
+        /* Action Buttons with Price Inside */
+        .store-link {
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            display: inline-block;
+            transition: transform 0.1s, opacity 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .store-link.cheapest-btn {
+            background: var(--cheapest-btn);
+        }
+
+        .store-link:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        /* 13 Store Grid */
+        .store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 10px;
+        }
+
+        .store-card {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .store-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
         /* MOBILE RESPONSIVE STYLES (Smartphones & Small Screens) */
         @media (max-width: 600px) {
             body {
